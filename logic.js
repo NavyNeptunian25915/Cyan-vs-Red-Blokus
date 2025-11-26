@@ -471,10 +471,10 @@ m.oppLegal = oppLegalAfter;
 m.ratio = ratioAfter.toFixed(3);
 
 // ---- Threshold-based judgement ----
-if (deltaYou >= 0 && deltaOpp <= -0.5) {
+if (deltaYou >= 0 && deltaOpp <= -1) {
     label = "Sigma";
     cssClass = "move-sigma";
-} else if (deltaYou >= 0.5 && deltaOpp <= 0) {
+} else if (deltaYou >= 1 && deltaOpp <= 0) {
     label = "Chad";
     cssClass = "move-chad";
 } else if (deltaYou >= 0 && deltaOpp <= 0) {
@@ -610,3 +610,4 @@ gameState.cyanPieces = pieceShapes.map(shape=>({shape,player:'cyan'}));
 gameState.redPieces = pieceShapes.map(shape=>({shape,player:'red'}));
 renderPieces();
 updateGameReview();
+
