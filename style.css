@@ -1,0 +1,260 @@
+/* Import Orbitron font */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap');
+
+/* General styling */
+body {
+    font-family: 'Orbitron', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #000064; /* Black background */
+    color: #eee;
+    margin: 0;
+}
+#eval-bar {
+    width: 99.8%;
+    height: 20px;
+    display: flex;
+    border: 1px solid #fff;
+    margin: 10px 0;
+    border-radius: 20ch;
+    overflow: hidden;
+    transition: width 1s ease-in-out; /* instant */
+}
+
+#cyan-bar {
+    background: cyan;
+    height: 100%;
+    width: 50%; /* start balanced */
+    transition: width 1s ease-in-out; /* instant */
+}
+
+#red-bar {
+    background: red;
+    height: 100%;
+    width: 50%;
+    transition: width 1s ease-in-out; /* instant */
+}
+
+.game-container {
+    text-align: center;
+}
+
+/* Board styling */
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(9, 20px);
+    grid-template-rows: repeat(9, 20px);
+    border: 2px solid #fff;
+    background-color: #000064; /* Darker board background */
+    margin: 20px auto;
+    box-shadow: 0 0 20px rgb(255, 255, 255);
+}
+
+.cell {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #fff;
+    box-sizing: border-box;
+    background: #000064; /* Dark empty squares */
+}
+
+/* Piece styling */
+.piece-selection {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0;
+    justify-content: center;
+}
+
+/* Piece container — transparent so only the small cells show */
+.piece {
+    display: inline-block;
+    padding: 4px;
+    background: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+/* The mini-grid inside each piece */
+.piece-grid {
+    display: grid;
+    grid-auto-rows: 25px;        /* same as board size */
+    grid-auto-columns: 25px;
+    gap: 1px;
+}
+
+/* Cells */
+.piece-cell {
+    width: 25px;
+    height: 25px;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+
+/* Invisible empty cell keeps shape spacing */
+.piece-cell.empty {
+    background: transparent;
+    border: white;
+}
+
+/* Filled styles */
+.piece-cell.filled-cyan {
+    background: cyan;
+    box-shadow: 0 0 6px cyan;
+}
+.piece-cell.filled-red {
+    background: red;
+    box-shadow: 0 0 6px red;
+}
+
+/* Shrink the whole preview piece */
+.piece-grid {
+    transform: scale(0.6);      /* adjust size */
+    transform-origin: top left;
+}
+
+.piece:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 12px rgba(255,255,255);
+}
+
+.piece.selected {
+    outline: 2px solid lime;
+}
+
+.piece-cell {
+    width: 15px;
+    height: 15px;
+    border: 1px solid #000064;
+    box-sizing: border-box;
+}
+
+/* cyan and red glowing effects */
+.cyan {
+    background-color: cyan;
+    box-shadow: 0 0 8px cyan;
+}
+
+.red {
+    background-color: red;
+    box-shadow: 0 0 8px red;
+}
+
+/* Player areas and controls */
+.player-area {
+    margin: 20px;
+}
+
+.cyan-player {
+    color: cyan;
+    text-shadow: 0 0 6px cyan;
+}
+
+.red-player {
+    color: red;
+    text-shadow: 0 0 6px red;
+}
+
+.status h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.controls button {
+    padding: 10px 20px;
+    margin: 5px;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    background: #000064;
+    color: #fff;
+    border: 1px solid #ffffff;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.controls button:hover {
+    background: #000064;
+    border-color: #ffffff;
+    color: #fff;
+}
+/* Game Review Panel */
+.game-review {
+    margin-top: 20px;
+    padding: 15px;
+    background: #000064;
+    border: 2px solid #ffffff;
+    border-radius: 8px;
+    color: white;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.game-review h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #ffffff; /* white accent */
+}
+
+#move-log {
+    max-height: 200px;
+    overflow-y: auto;
+    text-align: left;
+    font-size: 14px;
+    line-height: 1.4em;
+}
+
+/* Labels for moves */
+.move-good {
+  color: #00ff00;
+  font-weight: 400;
+  background-image:  url(file:///Users/shreyansh/Desktop/Moves/Good-Sticker.png) no-repeat left center;
+  background-size: 20px 20px;
+  padding-left: 28px;
+}
+.move-ok {
+  color: #80ff00;
+  font-weight: 400;
+  background-image:  url(file:///Users/shreyansh/Desktop/Moves/Ok-Sticker.png) no-repeat left center;
+  background-size: 20px 20px;
+  padding-left: 28px;
+}
+.move-strange {
+  color: #ffff00;
+  font-weight: 400;
+  background-image:  url(file:///Users/shreyansh/Desktop/Moves/Strange-Sticker.png) no-repeat left center;
+  background-size: 20px 20px;
+  padding-left: 28px;
+}
+.move-bad {
+  color: #ff8000;
+  font-weight: 400;
+  background-image:  url(file:///Users/shreyansh/Desktop/Moves/Bad-Sticker.png) no-repeat left center;
+  background-size: 20px 20px;
+  padding-left: 28px;
+}
+  .move-clown {
+  color: #ff0000;
+  font-weight: 400;
+  background-image:  url(file:///Users/shreyansh/Desktop/Moves/Clown-Sticker.png) no-repeat left center;
+  background-size: 20px 20px;
+  padding-left: 28px;
+}
+.move-sigma {
+  color: #00ffff;
+  font-weight: 800;
+  text-shadow: 0 0 6px magenta;
+  background-image:  url(file:///Users/shreyansh/Desktop/Moves/Sigma-Sticker.png) no-repeat left center;
+  background-size: 20px 20px;
+  padding-left: 28px;
+}
+.move-chad {
+  color: #00ff80;
+  font-weight: 600;
+  text-shadow: 0 0 6px purple;
+  background-image:  url(file:///Users/shreyansh/Desktop/Moves/Chad-Sticker.png) no-repeat left center;
+  background-size: 20px 20px;
+  padding-left: 28px;
+}

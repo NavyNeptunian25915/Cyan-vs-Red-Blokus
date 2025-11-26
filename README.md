@@ -1,2 +1,2 @@
 # Cyan-vs-Red-Blokus
-Super fun
+So fun
