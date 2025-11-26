@@ -15,6 +15,27 @@ let BOARD_SIZE = parseInt(prompt("Enter board size (e.g., 15 for 15x15):", "15")
 if (isNaN(BOARD_SIZE) || BOARD_SIZE < 5) BOARD_SIZE = 5; // Minimum size 5x5
 if (isNaN(BOARD_SIZE) || BOARD_SIZE > 1000) BOARD_SIZE = 1000; // Maximum size 1000x1000
 
+// --- Seeded RNG for deterministic analysis ---
+const rngSeedInput = prompt("Enter RNG seed (leave blank for random):", "");
+function _hashCode(str){
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+}
+function _mulberry32(a) {
+    return function() {
+        var t = a += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    }
+}
+const _seed = (rngSeedInput && rngSeedInput.trim() !== "") ? _hashCode(rngSeedInput) : Math.floor(Math.random() * 1e9);
+const rng = _mulberry32(_seed);
+
 let gameState = {
     board: Array(BOARD_SIZE).fill(0).map(() => Array(BOARD_SIZE).fill(null)),
     turn: 'cyan',       // cyan is human, red is AI
@@ -169,10 +190,10 @@ function generateShapes() {
 
     // --- Random blobs (extra variety) ---
     for (let n = 0; n < 100; n++) {
-        const h = 2 + Math.floor(Math.random() * 5);
-        const w = 2 + Math.floor(Math.random() * 5);
+        const h = 2 + Math.floor(rng() * 5);
+        const w = 2 + Math.floor(rng() * 5);
         const blob = Array.from({ length: h }, () =>
-            Array.from({ length: w }, () => Math.random() > 0.5)
+            Array.from({ length: w }, () => rng() > 0.5)
         );
         if (blob.flat().some(Boolean)) shapes.push(blob);
     }
@@ -389,7 +410,7 @@ function aiMove() {
         return;
     }
 
-    const move = bestMoves[Math.floor(Math.random()*bestMoves.length)];
+    const move = bestMoves[Math.floor(rng()*bestMoves.length)];
     gameState.selectedPiece = {...gameState.redPieces[move.index], player:'red'};
     placePiece(move.row, move.col);
     endTurn(move.row, move.col, move.index);
@@ -426,25 +447,52 @@ function updateGameReview() {
             label = 'Good';
             cssClass='move-good';
         } else {
-            const playerFactor = m.player==='cyan'?1:-1;
-            const beforeMove = i>0 ? gameState.moveHistory[i-1].eval : 0;
-            const afterMove = m.eval;
-            const absoluteDelta = ((afterMove - beforeMove)*100)*playerFactor; // Normalize
+// ---- NEW ADVANCED MOVE CLASSIFIER ----
+// Evaluate legal move ratios before and after move
+const youLegalBefore = m.youLegalBefore;
+const oppLegalBefore = m.oppLegalBefore;
 
-            if(absoluteDelta <= -30){ label =  'Clown';
-            cssClass='move-clown'; }
-            else if(absoluteDelta <= -20){ label = 'Bad';
-            cssClass='move-bad'; }
-            else if(absoluteDelta <= -10){ label = 'Strange';
-            cssClass='move-strange'; }
-            else if(absoluteDelta < 0){ label = 'Ok';
-            cssClass='move-ok'; }
-            else if(absoluteDelta < 20){ label = 'Good';
-            cssClass='move-good'; }
-            else if(absoluteDelta < 40){ label = 'Chad';
-            cssClass='move-chad'; }
-            else { label = 'Sigma'; 
-            cssClass='move-sigma'; }
+const youLegalAfter = m.youLegalAfter;
+const oppLegalAfter = m.oppLegalAfter;
+
+// You suppression metric
+const ratioBefore = youLegalBefore / (youLegalBefore + oppLegalBefore);
+const ratioAfter = youLegalAfter / (youLegalAfter + oppLegalAfter);
+const deltaYou = ratioAfter - ratioBefore;
+
+// Opponent suppression metric
+const oppRatioBefore = oppLegalBefore / (oppLegalBefore + youLegalBefore);
+const oppRatioAfter = oppLegalAfter / (oppLegalAfter + youLegalAfter);
+const deltaOpp = oppRatioAfter - oppRatioBefore;
+
+// Store metrics for later review
+m.youLegal = youLegalAfter;
+m.oppLegal = oppLegalAfter;
+m.ratio = ratioAfter.toFixed(3);
+
+// ---- Threshold-based judgement ----
+if (deltaYou >= 0 && deltaOpp <= -0.5) {
+    label = "Sigma";
+    cssClass = "move-sigma";
+} else if (deltaYou >= 0.5 && deltaOpp <= 0) {
+    label = "Chad";
+    cssClass = "move-chad";
+} else if (deltaYou >= 0 && deltaOpp <= 0) {
+    label = "Good";
+    cssClass = "move-good";
+} else if (deltaYou >= -0.1 && deltaOpp <= 0.1) {
+    label = "Ok";
+    cssClass = "move-ok";
+} else if (deltaYou >= -0.2 && deltaOpp <= 0.2) {
+    label = "Strange";
+    cssClass = "move-strange";
+} else if (deltaYou >= -0.3 && deltaOpp <= 0.3) {
+    label = "Bad";
+    cssClass = "move-bad";
+} else {
+    label = "Clown";
+    cssClass = "move-clown";
+}
         }
         return `<div class="${cssClass}">${i+1}. ${m.player} placed piece ${m.index} at (${m.row},${m.col}) — ${label} (Eval: ${m.eval})</div>`;
     }).join('');
@@ -458,12 +506,36 @@ function endTurn(row,col,pieceIndex){
     const prevTurn = gameState.turn;
     const Position = (countLegalMoves('cyan') / (countLegalMoves('cyan') + countLegalMoves('red'))-0.5)*2; // Normalize between -1 to 1
 
-    gameState.moveHistory.push({
-        player: prevTurn,
-        index: pieceIndex,
-        row, col,
-        eval: Position, // Just for display
-    });
+// Compute legal move counts BEFORE move (use last state)
+const prevHistory = gameState.moveHistory[gameState.moveHistory.length - 1];
+const youLegalBefore = prevHistory ? prevHistory.youLegalAfter : countLegalMoves(prevTurn);
+const oppLegalBefore = prevHistory ? prevHistory.oppLegalAfter : countLegalMoves(prevTurn === "cyan" ? "red" : "cyan");
+
+// Compute legal move counts AFTER move
+const youLegalAfter = countLegalMoves(prevTurn);
+const oppLegalAfter = countLegalMoves(prevTurn === "cyan" ? "red" : "cyan");
+
+// Freeze ratio calculations
+const ratioBefore = youLegalBefore / Math.max(1, oppLegalBefore);
+const ratioAfter = youLegalAfter / Math.max(1, oppLegalAfter);
+
+const deltaYou = ratioAfter - ratioBefore;
+const deltaOpp = (oppLegalAfter / Math.max(1, youLegalAfter)) - (oppLegalBefore / Math.max(1, youLegalBefore));
+
+gameState.moveHistory.push({
+    player: prevTurn,
+    index: pieceIndex,
+    row, col,
+    eval: Position,
+    youLegalBefore,
+    oppLegalBefore,
+    youLegalAfter,
+    oppLegalAfter,
+    ratioBefore: Number(ratioBefore.toFixed(3)),
+    ratioAfter: Number(ratioAfter.toFixed(3)),
+    deltaYou: Number(deltaYou.toFixed(3)),
+    deltaOpp: Number(deltaOpp.toFixed(3))
+});
 
     gameState.selectedPiece=null;
     gameState.selectedPieceIndex=-1;
