@@ -458,12 +458,15 @@ const oppLegalAfter = m.oppLegalAfter;
 // You suppression metric
 const ratioBefore = youLegalBefore / (youLegalBefore + oppLegalBefore);
 const ratioAfter = youLegalAfter / (youLegalAfter + oppLegalAfter);
-const deltaYou = ratioAfter - ratioBefore;
+const deltaYou = ratioAfter / (ratioAfter + ratioBefore);
 
 // Opponent suppression metric
 const oppRatioBefore = oppLegalBefore / (oppLegalBefore + youLegalBefore);
 const oppRatioAfter = oppLegalAfter / (oppLegalAfter + youLegalAfter);
-const deltaOpp = oppRatioAfter - oppRatioBefore;
+const deltaOpp = oppRatioAfter / (oppRatioAfter + oppRatioBefore);
+
+// Overall Delta
+const deltaRatio = deltaYou - deltaOpp;
 
 // Store metrics for later review
 m.youLegal = youLegalAfter;
@@ -471,28 +474,28 @@ m.oppLegal = oppLegalAfter;
 m.ratio = ratioAfter.toFixed(3);
 
 // ---- Threshold-based judgement ----
-if (deltaYou >= 0 && deltaOpp <= -1) {
+if (deltaRatio >= 0.3) {
     label = "Sigma";
     cssClass = "move-sigma";
-} else if (deltaYou >= 1 && deltaOpp <= 0) {
+} else if (deltaRatio >= 0.15) {
     label = "Chad";
     cssClass = "move-chad";
-} else if (deltaYou >= 0 && deltaOpp <= 0) {
+} else if (deltaRatio >= 0) {
     label = "Good";
     cssClass = "move-good";
-} else if (deltaYou >= -0.1 && deltaOpp <= 0.1) {
+} else if (deltaRatio > -0.05) {
     label = "Ok";
     cssClass = "move-ok";
-} else if (deltaYou >= -0.2 && deltaOpp <= 0.2) {
+} else if (deltaRatio > -0.1) {
     label = "Strange";
     cssClass = "move-strange";
-} else if (deltaYou >= -0.3 && deltaOpp <= 0.3) {
+} else if (deltaRatio < -0.15) {
     label = "Bad";
     cssClass = "move-bad";
 } else {
     label = "Clown";
     cssClass = "move-clown";
-}
+}[]
         }
         return `<div class="${cssClass}">${i+1}. ${m.player} placed piece ${m.index} at (${m.row},${m.col}) — ${label} (Eval: ${m.eval})</div>`;
     }).join('');
@@ -610,4 +613,3 @@ gameState.cyanPieces = pieceShapes.map(shape=>({shape,player:'cyan'}));
 gameState.redPieces = pieceShapes.map(shape=>({shape,player:'red'}));
 renderPieces();
 updateGameReview();
-
