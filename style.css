@@ -210,51 +210,74 @@ body {
 .move-good {
   color: #00ff00;
   font-weight: 400;
-  background-image:  url(file:///Users/shreyansh/Desktop/Moves/Good-Sticker.png) no-repeat left center;
+  background-image: url("https://i.ibb.co/LXkqVyTq/Good-Sticker.png");
+  background-repeat: no-repeat;
+  background-position: left center;
   background-size: 20px 20px;
   padding-left: 28px;
 }
+
 .move-ok {
   color: #80ff00;
   font-weight: 400;
-  background-image:  url(file:///Users/shreyansh/Desktop/Moves/Ok-Sticker.png) no-repeat left center;
+  background-image: url("https://i.ibb.co/N6JWnwcP/Ok-Sticker.png");
+  background-repeat: no-repeat;
+  background-position: left center;
   background-size: 20px 20px;
   padding-left: 28px;
 }
+
 .move-strange {
   color: #ffff00;
   font-weight: 400;
-  background-image:  url(file:///Users/shreyansh/Desktop/Moves/Strange-Sticker.png) no-repeat left center;
+  background-image: url("https://i.ibb.co/VWH3DPNJ/Strange-Sticker.png");
+  background-repeat: no-repeat;
+  background-position: left center;
   background-size: 20px 20px;
   padding-left: 28px;
 }
+
 .move-bad {
   color: #ff8000;
   font-weight: 400;
-  background-image:  url(file:///Users/shreyansh/Desktop/Moves/Bad-Sticker.png) no-repeat left center;
+  background-image: url("https://i.ibb.co/gFb9Qkg3/Bad-Sticker.png");
+  background-repeat: no-repeat;
+  background-position: left center;
   background-size: 20px 20px;
   padding-left: 28px;
 }
-  .move-clown {
+
+.move-clown {
   color: #ff0000;
   font-weight: 400;
-  background-image:  url(file:///Users/shreyansh/Desktop/Moves/Clown-Sticker.png) no-repeat left center;
+  background-image: url("https://i.ibb.co/hRKhT260/Clown-Sticker.png");
+  background-repeat: no-repeat;
+  background-position: left center;
   background-size: 20px 20px;
   padding-left: 28px;
 }
+
 .move-sigma {
   color: #00ffff;
   font-weight: 800;
   text-shadow: 0 0 6px magenta;
-  background-image:  url(file:///Users/shreyansh/Desktop/Moves/Sigma-Sticker.png) no-repeat left center;
+  background-image: url("https://i.ibb.co/35W4LpDw/Sigma-Sticker.png");
+  background-repeat: no-repeat;
+  background-position: left center;
   background-size: 20px 20px;
   padding-left: 28px;
 }
+
 .move-chad {
   color: #00ff80;
   font-weight: 600;
   text-shadow: 0 0 6px purple;
-  background-image:  url(file:///Users/shreyansh/Desktop/Moves/Chad-Sticker.png) no-repeat left center;
+  background-image: url("https://i.ibb.co/3526vYdq/Chad-Sticker.png");
+  background-repeat: no-repeat;
+  background-position: left center;
   background-size: 20px 20px;
   padding-left: 28px;
 }
+
+
+
